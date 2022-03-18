@@ -6,11 +6,11 @@ const net = require('net');
 const SSDP = require('node-ssdp').Client
 const ssdpClient = new SSDP();
 
-let routerAddr = 'fritz.box';
-let routerPort = 49000;
-let routerSsdpSet = false;
+let routerAddr = process.env.ROUTER_HOST || 'fritz.box';
+let routerPort = process.env.ROUTER_PORT || 49000;
+let routerSsdpSet = !!process.env.ROUTER_HOST;
 
-const refreshEvery = 10; // minutes
+const refreshEvery = process.env.REFRESH || 10; // minutes
 
 (async () => {
     let lastDevice;
@@ -70,10 +70,8 @@ const refreshEvery = 10; // minutes
             };
 
             const callback = res => {
-                console.log(`STATUS: ${res.statusCode}`);
                 res.setEncoding('utf8');
                 res.on('data', data => {
-                //console.log(data)
                     accept(JSON.parse(data));
                 });
                 res.on('error', data => rekt(data));
@@ -139,12 +137,12 @@ const refreshEvery = 10; // minutes
             NewInternalClient: hostIP,
             NewEnabled: '1',
             NewPortMappingDescription: 'auto-docker-upnp',
-            NewLeaseDuration: refreshEvery * 2,
+            NewLeaseDuration: refreshEvery * 60 * 2,
         };
         const ret = await cb2promise(f,
             options
         );
-        console.log("+Opened Port", options);
+        console.log(new Date().toUTCString(), "+Opened Port", options);
     }
 
     const runRepeated = async () => {
@@ -152,7 +150,6 @@ const refreshEvery = 10; // minutes
         for(let portcfgNo in portcfgs) {
             const portcfg = portcfgs[portcfgNo];
             openPort(portcfg);
-            //console.log('open port', portcfg)
         }
     };
 
@@ -162,7 +159,7 @@ const refreshEvery = 10; // minutes
     };
 
     ssdpClient.on('response', function (headers, statusCode, rinfo) {
-        console.log('Got a response to an m-search.', headers, statusCode, rinfo);
+        console.log(new Date().toUTCString(), 'Got a response to an m-search.', headers, statusCode, rinfo);
         const url = new URL(headers?.LOCATION);
         if (url?.hostname && !routerSsdpSet) {
             routerSsdpSet = true;
@@ -172,6 +169,6 @@ const refreshEvery = 10; // minutes
             run();
         }
     });
-    console.log('Searching routers...');
+    console.log(new Date().toUTCString(), 'Searching routers...');
     ssdpClient.search('urn:schemas-upnp-org:device:InternetGatewayDevice:1');
 })();
