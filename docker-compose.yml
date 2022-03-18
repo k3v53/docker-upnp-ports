@@ -1,0 +1,9 @@
+version: '3'
+services:
+  upnp:
+    restart: unless-stopped
+    build: .
+    image: kartoffel:5000/upnp
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

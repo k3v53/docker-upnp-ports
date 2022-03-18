@@ -1,0 +1,17 @@
+{
+  "name": "sesame-upnp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-ssdp": "^4.0.1",
+    "request": "^2.88.2",
+    "tr-064": "^0.2.0",
+    "wtfnode": "^0.9.1"
+  }
+}
