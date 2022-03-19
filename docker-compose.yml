@@ -3,7 +3,7 @@ services:
   upnp:
     restart: unless-stopped
     build: .
-    image: kartoffel:5000/upnp
+    image: noxi/docker-upnp-ports:latest
     network_mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
