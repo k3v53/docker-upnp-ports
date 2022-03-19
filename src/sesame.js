@@ -91,11 +91,15 @@ const refreshEvery = process.env.REFRESH || 10; // minutes
                 console.log('skipping container (no upnp label)', container?.Names?.[0], container?.Id);
                 continue;
             }
+            console.log('inspecting container', container?.Names?.[0], container?.Id);
             const whitelist = container?.Labels?.['upnp-whitelist']?.split(/[,\s]+/);
             for(let portNo in container.Ports) {
                 const port = container.Ports[portNo];
-                if(!whitelist || whitelist.contains(port.PublicPort)){
+                if(!whitelist || whitelist.includes('' + port.PublicPort)){
+                    console.log('inspecting container port', container?.Names?.[0], container?.Id, port.PublicPort);
                     portcfgs.push({...port, container})
+                } else {
+                    console.log('skipping container (not in upnp-whitelist label)', container?.Names?.[0], container?.Id, port.PublicPort);
                 }
             }
         }
