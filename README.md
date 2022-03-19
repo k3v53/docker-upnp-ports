@@ -2,9 +2,9 @@
 This is a little Nodejs script which can open ports on a router dynamically based on the opened ports of your containers.
 
 ## Quickstart
-Start a docker container with the image `noxi/docker-upnp-ports` and map the file `/var/run/docker.sock:/var/run/docker.sock` or use the provided `docker-compose.yml`.
+Start a docker container with the image [`noxi/docker-upnp-ports`](https://hub.docker.com/r/noxi/docker-upnp-ports) and map the file `/var/run/docker.sock:/var/run/docker.sock` also use the host network or use the provided [`docker-compose.yml`](https://github.com/alex-vg/docker-upnp-ports/blob/master/docker-compose.yml).
 
-`docker run --name docker-upnp-ports -d noxi/docker-upnp-ports -v "/var/run/docker.sock:/var/run/docker.sock"`
+`docker run -v /var/run/docker.sock:/var/run/docker.sock --net=host --name docker-upnp-ports -d noxi/docker-upnp-ports`
 
 
 ## Container-Labels
@@ -17,5 +17,5 @@ Start a docker container with the image `noxi/docker-upnp-ports` and map the fil
 - `ROUTER_PORT` (default: `49000`) specifies your router upnp port
 - `REFRESH` (default: 10) number in minutes between the port checks. Port lease time is `REFRESH`*2. 
 
-Still under development but works already great for me. 😄
+Still under development but already works great for me. 😄
 
