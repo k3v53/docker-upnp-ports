@@ -4,7 +4,7 @@ This is a little Nodejs script which can open ports on a router dynamically base
 ## Quickstart
 Start a docker container with the image [`noxi/docker-upnp-ports`](https://hub.docker.com/r/noxi/docker-upnp-ports) and map the file `/var/run/docker.sock:/var/run/docker.sock` also use the host network or use the provided [`docker-compose.yml`](https://github.com/alex-vg/docker-upnp-ports/blob/master/docker-compose.yml).
 
-`docker run -v /var/run/docker.sock:/var/run/docker.sock --net=host --name docker-upnp-ports -d noxi/docker-upnp-ports`
+`docker run -v /var/run/docker.sock:/var/run/docker.sock --net=host --name docker-upnp-ports --restart unless-stopped -d noxi/docker-upnp-ports`
 
 
 ## Container-Labels
