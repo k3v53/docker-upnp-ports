@@ -72,7 +72,11 @@ const refreshEvery = process.env.REFRESH || 10; // minutes
             const callback = res => {
                 res.setEncoding('utf8');
                 res.on('data', data => {
-                    accept(JSON.parse(data));
+                    try {
+                        accept(JSON.parse(data));
+                    } catch (e) {
+                        rekt(e);
+                    }
                 });
                 res.on('error', data => rekt(data));
             };
