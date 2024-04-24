@@ -1,7 +1,7 @@
 version: '3'
 services:
   upnp:
-    restart: unless-stopped
+    restart: unless-stopped:3
     build: .
     image: noxi/docker-upnp-ports:latest
     network_mode: host
