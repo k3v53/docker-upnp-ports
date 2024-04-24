@@ -32,7 +32,7 @@ const refreshEvery = process.env.REFRESH || 10; // minutes
     }
 
     const getHostIP = async () => {
-        const dockerIpResult = await cb2promise(dns.lookup, 'host.docker.internal');
+        const dockerIpResult = await new Promise((a)=>dns.lookup('host.docker.internal',a))
         const dockerIp = dockerIpResult?.[1];
         if(!dockerIp) {
             const client = await netConnect({port: 80, host:"google.com"});
@@ -47,18 +47,17 @@ const refreshEvery = process.env.REFRESH || 10; // minutes
 
     const getIGDDevice = () => {
         return new Promise((acccept, reject) => {
-            if(lastDevice) {
-                acccept(lastDevice);
-            } else {
-                tr064.initIGDDevice(routerAddr, routerPort, function (err, device) {
-                    if (!err) {
-                    lastDevice = device;
-                    acccept(lastDevice);
-                    } else {
-                        reject(err);
-                    }
-                });
-            }
+            if(lastDevice) return   acccept(lastDevice);
+                
+            tr064.initIGDDevice(routerAddr, routerPort, function (err, device) {
+                  if (!err) {
+                  lastDevice = device;
+                  acccept(lastDevice);
+                  } else {
+                      reject(err);
+                  }
+              });
+            
         });
     }
     
@@ -71,14 +70,22 @@ const refreshEvery = process.env.REFRESH || 10; // minutes
 
             const callback = res => {
                 res.setEncoding('utf8');
-                res.on('data', data => {
+                // Build response body in a string
+                let resBody = '';
+
+                // Listen for data and add
+                res.on('data', function (chunk) {
+                    resBody += chunk
+                });
+
+                res.on('end', data => {
                     try {
-                        accept(JSON.parse(data));
+                        accept(JSON.parse(resBody));
                     } catch (e) {
                         rekt(e);
                     }
                 });
-                res.on('error', data => rekt(data));
+                res.on('error', data => rekt(resBody));
             };
             
             const clientRequest = http.request(options, callback);
@@ -118,7 +125,7 @@ const refreshEvery = process.env.REFRESH || 10; // minutes
      * proto: "tcp"/"udp"
      * 
      * urn:schemas-upnp-org:service:WANIPConnection:1
-        # AddPortMapping
+        # AddPortM  ing
         IN : NewRemoteHost
         IN : NewExternalPort
         IN : NewProtocol
@@ -147,10 +154,16 @@ const refreshEvery = process.env.REFRESH || 10; // minutes
             NewPortMappingDescription: 'auto-docker-upnp',
             NewLeaseDuration: refreshEvery * 60 * 2,
         };
-        const ret = await cb2promise(f,
-            options
-        );
-        console.log(new Date().toUTCString(), "+Opened Port", options);
+        try {
+            const ret = await cb2promise(f,
+                options
+            );
+            
+        } catch (error) {
+            console.error(error)
+            console.log("There was an error trying to open a port, retrying in "+refreshEvery+" Minutes")
+        }
+        console.log(new Date().toUTCString(), "+Opened Port\n", options);
     }
 
     const runRepeated = async () => {
